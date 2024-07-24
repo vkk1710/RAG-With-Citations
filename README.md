@@ -5,9 +5,9 @@
 1. Create a new conda env using -
 ```
 conda env create -f environment.yml
-
+```
 or
-
+```
 conda create -n ENVNAME
 
 and
