@@ -1,0 +1,17 @@
+client.scroll(
+    collection_name="test1",
+    scroll_filter=models.Filter(
+        must=[
+            models.FieldCondition(key="file_name", match=models.MatchValue(value='nvidia_10k.pdf')),
+        ]
+    ),
+    limit=1,
+    with_payload=True,
+    with_vectors=False,
+)
+
+'2021-Ford-F-150-Owners-Manual-version-1_om_EN-US_09_2020.pdf'
+'nvidia_10k.pdf'
+'toyota_camry_2020.csv'
+
+export PYTHONPATH="${PYTHONPATH}:/opt/predii/miniconda3/envs/RAG-citations/lib/python3.12/site-packages:/opt/predii/miniconda3/envs/RAG-citations/lib/python3.12/site-packages"

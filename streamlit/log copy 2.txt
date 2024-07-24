@@ -1,0 +1,11 @@
+--> spacy with disable = ['parser'] and enable = ['senter']
+
+No of doc_dicts = 872
+
+No of docs_content after chunking = 4408
+
+Created the Qdrant client and the retriever object in 1.4260034561157227 secs
+Time for chunking = 35.672977924346924 secs
+Time for embedding = 18.45906639099121 secs
+Time for get_all_collections func = 0.0015611648559570312 secs
+Time for uploading all the points in the collection = 2.12955641746521 secs

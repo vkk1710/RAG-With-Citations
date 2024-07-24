@@ -1,0 +1,11 @@
+--> spacy with full pipeline and map for sentence splitting
+
+No of doc_dicts = 872
+
+No of docs_content after chunking = 4727
+
+Created the Qdrant client and the retriever object in 1.4686784744262695 secs
+Time for chunking = 42.77404046058655 secs
+Time for embedding = 25.546861171722412 secs
+Time for get_all_collections func = 0.001638174057006836 secs
+Time for uploading all the points in the collection = 2.2758944034576416 secs

@@ -1,0 +1,1 @@
+Created the Qdrant client and the retriever object in 1.3765745162963867 secs
