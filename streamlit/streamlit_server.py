@@ -19,7 +19,7 @@ retriever_model = 'intfloat/e5-large'
 # retriever_model = 'mixedbread-ai/mxbai-embed-large-v1'
 retriever = MxbaiRetriever(retriever_model,db)
 ranker = MxbaiReranker('mixedbread-ai/mxbai-rerank-large-v1')
-generator = LlamaGenerator('meta-llama/Meta-Llama-3-8B-Instruct', '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')
+generator = LlamaGenerator('meta-llama/Meta-Llama-3.1-8B-Instruct', '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')
 
 embedder_prompts = {
     'mixedbread-ai/mxbai-embed-large-v1': {
@@ -50,11 +50,11 @@ def output_formatter(raw_output):
     
     citations_list = []
     out = ' '.join(raw_output.splitlines())
-    content = re.split(r'[A|a]nswer:', out)[1]
-    content = re.split(r'[C|c]itations:', content)
+    content = re.split(r'"?[A|a]nswer"?:', out)[1]
+    content = re.split(r'"?[C|c]itations"?:', content)
     answer_text = content[0].strip()
     citations_text = content[1]
-    citations_text = re.split(r'[N|n]ote:', citations_text)[0].strip()
+    citations_text = re.split(r'"?[N|n]ote"?:', citations_text)[0].strip()
     
     citations = re.split(r'\n', citations_text)
     
@@ -100,11 +100,11 @@ def clean_output(raw_output):
     print('\n\nRaw Output from the LLM: ', raw_output, '\n\n')
     output = None
     
-    st = re.search('{(\n)?"answer"', raw_output)
+    st = re.search('{\n?(\s{1,4})?"[A|a]nswer"', raw_output)
     end = re.search('](\n)?}', raw_output)
     
     if (st == None or end == None):
-        match = re.search(r'[C|c]itations:', raw_output)
+        match = re.search(r'"?[C|c]itations"?:', raw_output)
         if match == None:
             output = raw_output
             is_raw_output = True
@@ -191,4 +191,4 @@ def llm_chat(params: LLMInput):
     return response
 
 if __name__ == "__main__":
-    uvicorn.run(host='0.0.0.0',port=8000,app=app)
+    uvicorn.run(host='0.0.0.0',port=8003,app=app)

@@ -207,7 +207,7 @@ if prompt := st.chat_input("Enter Query"):
     # except requests.exceptions.ConnectionError:
     #     r.status_code = "Connection refused"
 
-    output = requests.post(url='http://127.0.0.1:8000/chat', data=data).text
+    output = requests.post(url='http://127.0.0.1:8003/chat', data=data).text
     output = json.loads(output)
     
     response = output['answer']
