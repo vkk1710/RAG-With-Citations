@@ -12,11 +12,19 @@ from streamlit_pdf_viewer import pdf_viewer
 
 st.title("Predii RAG")
 
+#Load config
+config_path = "./config.json"
+
+with open(config_path, 'r') as j:
+     config = json.loads(j.read())
+
+collection_name = config["collection_name"]
+retriever_model = config["retriever_model"]
+is_TSB = config["is_TSB"]
+
 start_time = time.time()
-client = QdrantDB() 
-collection_name = 'test2'
-retriever_model = 'intfloat/e5-large'
-# retriever_model = 'mixedbread-ai/mxbai-embed-large-v1'
+client = QdrantDB(is_TSB=is_TSB) 
+
 retriever = MxbaiRetriever(retriever_model, client)
 end_time = time.time()
 print(f'Created the Qdrant client and the retriever object in {end_time - start_time} secs')
@@ -32,17 +40,22 @@ embedder_prompts = {
     }
 } 
     
-def upload_docs(docs_path='./streamlit_documents'):
+def upload_docs(docs_path='./streamlit_documents', is_TSB = True):
     file_names = []
     start_time = time.time()
-    # chunks = PDFSentenceChunker(file_dir=docs_path, document_names=file_names).chunk_new() + CSVDataLoader(file_dir=docs_path, document_names=file_names).load_data()
-    chunks = TSBSentenceChunker(file_dir=docs_path, document_names=file_names).chunk()
+    if is_TSB:
+        chunks = TSBSentenceChunker(file_dir=docs_path, document_names=file_names).chunk()
+    else:
+        chunks = PDFSentenceChunker(file_dir=docs_path, document_names=file_names).chunk_new() + CSVDataLoader(file_dir=docs_path, document_names=file_names).load_data()
+    
     end_time = time.time()
     print(f'Time for chunking = {end_time - start_time} secs')
     
     chunk_sents = [chunk['text'] for chunk in chunks]
-    chunk_metadata = list(set([(chunk['metadata'], chunk['file_name']) for chunk in chunks]))
-    chunk_meta_texts = [x[0] for x in chunk_metadata]
+    
+    if is_TSB:
+        chunk_metadata = list(set([(chunk['metadata'], chunk['file_name']) for chunk in chunks]))
+        chunk_meta_texts = [x[0] for x in chunk_metadata]
     
     # print(f'Number of chunk sentences = {len(chunk_sents)}\n')
     # print('Chunks after chunking done = \n\n', chunks[:5], '\n')
@@ -51,8 +64,10 @@ def upload_docs(docs_path='./streamlit_documents'):
     
     start_time = time.time()
     emb = retriever.embed(chunk_sents, prompt=passage_prompt)
-    meta_emb = retriever.embed(chunk_meta_texts, prompt=passage_prompt)    
-    meta_emb = {chunk_metadata[idx][1]:meta_emb[idx] for idx, _ in enumerate(chunk_metadata)}
+    
+    if is_TSB:
+        meta_emb = retriever.embed(chunk_meta_texts, prompt=passage_prompt)    
+        meta_emb = {chunk_metadata[idx][1]:meta_emb[idx] for idx, _ in enumerate(chunk_metadata)}
     # print('emb dimensions = ', emb.shape, '\n')
     # print('meta_emb = ', meta_emb, '\n')
     
@@ -62,7 +77,19 @@ def upload_docs(docs_path='./streamlit_documents'):
     start_time = time.time()
     client.create_collection(collection_name, retriever_model)
     st.toast('Created new collection!')
-    client.upload_points(collection_name, emb, meta_emb, chunks)
+    
+    if is_TSB:
+        vectors = {
+            'text': emb,
+            'metadata': meta_emb
+        }
+    else:
+        vectors = {
+            'text': emb,
+            'metadata': None
+        }
+     
+    client.upload_points(collection_name, vectors, chunks)
     end_time = time.time()
     print(f'Time for uploading all the points in the collection = {end_time - start_time} secs')
     
@@ -83,7 +110,7 @@ def display_citations(highlighted_docs):
 
 with st.sidebar:
     docs_source = './streamlit_documents'
-    upload_docs(docs_source)
+    upload_docs(docs_source, is_TSB)
     st.markdown("""---""")
     temp = st.sidebar.slider('Temperature', 0.0, 1.0, 0.1)
     max_tokens = st.sidebar.slider('Max New Tokens', 0, 8192, 1024)

@@ -1,0 +1,8 @@
+{
+    "collection_name": "test2",
+    "retriever_model": "intfloat/e5-large",
+    "is_TSB": true,
+    "reranking_model": "mixedbread-ai/mxbai-rerank-large-v1",
+    "generator": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+    "llama_token": "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"
+}

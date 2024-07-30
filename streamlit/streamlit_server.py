@@ -12,14 +12,23 @@ from vectorDB.qdrantdb import QdrantDB
 from highlight_docs import *
 from typing import List
 
-db = QdrantDB()
-collection_name = 'test2'
+# Load config
+config_path = "./config.json"
 
-retriever_model = 'intfloat/e5-large'
-# retriever_model = 'mixedbread-ai/mxbai-embed-large-v1'
+with open(config_path, 'r') as j:
+     config = json.loads(j.read())
+
+collection_name = config["collection_name"]
+retriever_model = config["retriever_model"]
+is_TSB = config["is_TSB"]
+reranking_model = config["reranking_model"]
+generator = config["generator"]
+llama_token = config["llama_token"]
+
+db = QdrantDB(is_TSB=is_TSB)
 retriever = MxbaiRetriever(retriever_model,db)
-ranker = MxbaiReranker('mixedbread-ai/mxbai-rerank-large-v1')
-generator = LlamaGenerator('meta-llama/Meta-Llama-3.1-8B-Instruct', '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')
+ranker = MxbaiReranker(reranking_model)
+generator = LlamaGenerator(generator, llama_token)
 
 embedder_prompts = {
     'mixedbread-ai/mxbai-embed-large-v1': {
