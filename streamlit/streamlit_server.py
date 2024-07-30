@@ -13,7 +13,7 @@ from highlight_docs import *
 from typing import List
 
 db = QdrantDB()
-collection_name = 'test10'
+collection_name = 'test2'
 
 retriever_model = 'intfloat/e5-large'
 # retriever_model = 'mixedbread-ai/mxbai-embed-large-v1'

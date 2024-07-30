@@ -13,8 +13,8 @@ class QdrantDB(BaseVectordb):
         # self.client = QdrantClient(path="./qdrant_db_collections")
         self.client = QdrantClient("localhost", port=6333)
     
-    def create_collection(self, collection_name:str):
-        encoder = SentenceTransformer("mixedbread-ai/mxbai-embed-large-v1")
+    def create_collection(self, collection_name:str, embedder_model:str):
+        encoder = SentenceTransformer(embedder_model)
 
         collection = self.client.recreate_collection(
                         collection_name=collection_name,
